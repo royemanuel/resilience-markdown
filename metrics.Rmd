@@ -1,0 +1,120 @@
+---
+title: "Metrics"
+author: "Roy Emanuel II"
+output: word_document
+---
+# Why this?
+
+  My current method for calculating metrics is haphazard and needs to be
+  straightened out. I hope that by using rMarkdown, I can get something going
+  that looks like a word document somewhat.
+
+# Find Local Minima and Maxima
+
+  The thinking is that I will be able to do the point assessments much
+  faster using this. In fact, I only need to calculate the behavior over
+  time in a few selected spots, so that can reduce my calculations by
+  quite a bit.
+
+```{r}
+findLocalMinima <- function(colvec){
+  minimaLocation <- which(diff(sign(diff(colvec)))==2)+1
+  ## If the there is no "bowl," we still need to pick the minimum
+  if (length(minimaLocation)==0){
+      minimaLocation <- match(min(colvec), colvec)
+  }
+  return(minimaLocation)
+}
+
+findLocalMaxima <- function(colvec){
+    maximaLocation <- which(diff(sign(diff(colvec)))==-2)+1
+    ## If the there is no "bowl," we still need to pick the minimum
+    if (length(maximaLocation)==0){
+        maximaLocation <- match(max(colvec), colvec)
+    }
+    return(maximaLocation)
+}
+
+## sigmaApply applies intertemporal substitutability factor to build
+## a new column "ratio"
+sigmaApply <- function(tt, sigma, cn){
+    df <- tt %>%
+        mutate(ratio = ifelse(Performance > Need,
+                   1 + sigma *(Performance - Need)/Need,
+                   Performance / Need))
+    colnames(df)[dim(df)[2]] <- cn
+    df
+}
+
+findLocalMinima(c(1,2,3,4,5,4,5,4,6,7,3,-2,0))
+
+findLocalMaxima(c(1,4,56,3,5,3,5,2,1,3,2))
+  ```
+
+        Some more writing about all of this
+
+```{python}
+x = 'hello, python world!'
+print(x.split(' '))
+```
+# Calculating Resilience
+  ## Requirements
+  The following are required:
+  * R data frame
+  * These libraries
+  + plyr
+  + dplyr
+  + reshape2
+  + ggplot2
+  + extrafont
+  + caTools
+
+The strategy is to take a data frame that has a time marker column,
+a performance column, an endogenous preference column. This is all that
+is necessary to calculate the original metrics.
+## Example Data
+   We will demonstrate each of these calculations using a simple
+   dataframe
+```{r}
+library("plyr")
+library("dplyr")
+library("reshape2")
+library("ggplot2")
+library("extrafont")
+library("caTools")
+testDF <- data.frame(Time = seq(1,10),
+                     Performance = c(1, 1, 1, .75, .5, .25, 0, 0, 1, 1))
+```
+
+## Quotient Resilience
+   Quotient resilience is from Marquez-Ramirez 2012.
+   $$ R_Q (t)=\frac{\varphi(t)-\varphi(t_d)}{\varphi(t_0)-\varphi(t_d)} $$
+Here follows the code to build quotient resilience:
+```{r}
+quotResOld <- function(tt){
+    ## Define the value of the minimum performance for the entire profile
+    ## Much like the comments in ESDF, need to build a searching method
+    ## for accounting for multiple failures. Not built in at this time.
+    pd <- min(tt$Performance)
+    ## Baseline performance at time 1
+    p0 <- tt$Performance[1]
+    ## Pull the time of the failure by filtering for minimum performance
+    ## then taking the time value for the first row. May be more
+    ## elegant to use min, but I don't know if that is worthwhile
+    Td <- filter(tt, Performance == min(Performance))$Time[1]
+    ## print(Td)
+    qr <- tt %>%
+        mutate(QR = (Performance - pd)/(p0 - pd),
+               QR_Td = Td)
+    return(qr)
+}
+quotResOld(testDF)
+```
+Now building quotient resilience using the local minima
+```{r}
+quotientResilience <- function(tt){
+    ## Find all the local minima
+    mins <- findLocalMinima(tt$Performance)
+    maxs <- findLocalMaxima(tt$Performance)
+    return(data.frame(mins, maxs))
+}
