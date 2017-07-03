@@ -1,0 +1,35 @@
+---
+title: "Addendum for Metric Calculation"
+author: "Roy Emanuel II"
+output: word_document
+---
+
+# Introduction
+
+  This section is intended to build up the metric.R file and turn it
+  into a nice little piece of documentation. Icurrently lack this
+  documentation, and I think by putting this together, I'll be able to make
+  more sense of what I have built.
+
+
+# Resilience models
+
+  This study uses four resilience models and develops those into four
+  additional models that include the stakeholder preferences. The four
+  models are Quotient Resilience (QR), Total Quotient Resilience (TQR),
+  Resilience Factor ($\rho$), and Integral Resilience (IR).
+
+## Quotient Resilience
+      $$ R_Q (t)=\frac{\varphi(t)-\varphi(t_d)}{\varphi(t_0)-\varphi(t_d)} $$
+      
+# Models of Performance
+
+  The first problem is calculating resilience. Since the definitions that
+  were built in the body of the dissertation point towards the output of a
+  system, and its performance at or over certain times, the first thing
+  to do is define the time vector. Actually, no it isn't. The problem
+  is that I started by building the models of performance, and then I started
+  calculating resilience. 
+
+  ## Time Vector
+  This is the marker for the time of occurrence
