@@ -72,6 +72,9 @@ print(x.split(' '))
 The strategy is to take a data frame that has a time marker column,
 a performance column, an endogenous preference column. This is all that
 is necessary to calculate the original metrics.
+
+
+   
 ## Example Data
    We will demonstrate each of these calculations using a simple
    dataframe
@@ -118,3 +121,6 @@ quotientResilience <- function(tt){
     maxs <- findLocalMaxima(tt$Performance)
     return(data.frame(mins, maxs))
 }
+quotientResilience(testDF)
+print(testDF)
+```
